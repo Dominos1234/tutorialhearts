@@ -315,6 +315,10 @@ function (dojo, declare) {
             dojo.subscribe( 'trickWin', this, "notif_trickWin" );
             this.notifqueue.setSynchronous( 'trickWin', 1000 );
             dojo.subscribe( 'giveAllCardsToPlayer', this, "notif_giveAllCardsToPlayer" );
+
+            dojo.subscribe( 'newScores', this, "notif_newScores" );
+            dojo.subscribe('newHand', this, "notif_newHand");
+            dojo.subscribe('playCard', this, "notif_playCard");
             
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -328,14 +332,7 @@ function (dojo, declare) {
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
-        
-        setupNotifications : function() {
-            console.log('notifications subscriptions setup');
-
-            dojo.subscribe('newHand', this, "notif_newHand");
-            dojo.subscribe('playCard', this, "notif_playCard");
-
-        },
+    
 
         notif_newHand : function(notif) {
             // We received a new full hand of 13 cards.
@@ -346,6 +343,13 @@ function (dojo, declare) {
                 var color = card.type;
                 var value = card.type_arg;
                 this.playerHand.addToStockWithId(this.getCardUniqueId(color, value), card.id);
+            }
+        },
+
+        notif_newScores : function(notif) {
+            // Update players' scores
+            for ( var player_id in notif.args.newScores) {
+                this.scoreCtrl[player_id].toValue(notif.args.newScores[player_id]);
             }
         },
 
